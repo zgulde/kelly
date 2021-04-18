@@ -17,3 +17,8 @@ The work in this repo is done with [the hy programming language](https://hylang.
 ![](ending_distribution.png)
 
 ![](strategies_overtime.png)
+
+## Contents
+
+- `kelly.hy` contains functions for implementing different betting strategies and functions for creating simulations with different those betting strategies.
+- `explore-kelly.hy` contains code for exploring and visualizing betting simulations. This file is a bit messy 😅

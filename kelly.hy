@@ -16,7 +16,7 @@
 (defclass BettingStrategy []
     "map of strategy name -> strategy function
     the strategy function takes in the current balance and the probability of
-    winning and returns"
+    winning and returns the amount to wager"
     (setv kelly (fn [available-funds p-win]
                     (* (- (* 2 p-win) 1) available-funds)))
     (setv half (fn [available-funds p-win] (/ available-funds 2)))
@@ -45,8 +45,9 @@
                         [initial-balance 100]
                         [strategy BettingStrategy.kelly]
                         [include-history? False]]
-    "Return a list of values of lengh iterations + 1.
-    Each element corresponds to the current balance at one iteration
+    "Run a simulation with the specified parameters and return the ending balance.
+    If include-history? return a list of values of lengh iterations + 1,
+    Each element corresponding to the current balance at that iteration + the initial balance.
     (including the initial)"
     (setv wins-losses
           (np.random.choice [True False]
@@ -62,6 +63,11 @@
                          [initial-balance 100]
                          [strategy BettingStrategy.kelly]
                          [include-history? False]]
+  "Do multiple simulations. Returns a array of shape (simulations,) each value
+  representing the ending balance after the specified number of iterations.
+  If include-history? return a array of shape (iterations, simulations)
+  each column representing one simulation, each row representing one simulations
+  each value is the current balance."
   (setv dataset (if include-history?
                     (lfor _ (range simulations)
                           (do-sim iterations p-win initial-balance strategy include-history?))
@@ -71,7 +77,8 @@
   (if include-history? (.transpose dataset) dataset))
 
 (defn make-df [sims iters]
-  "Each value represents ending funds."
+  "Create a dataframe with columns for each betting strategy.
+  Each value represents the ending funds for that simulation with that strategy."
   (setv sim-fn (partial do-sims :iterations iters :simulations sims))
   (pd.DataFrame (dict :kelly (sim-fn :strategy BettingStrategy.kelly)
                       :half (sim-fn :strategy BettingStrategy.half)
