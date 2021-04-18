@@ -15,7 +15,7 @@
 ;;
 
 (setv iterations 15
-      simulations 100
+      simulations 500
       do-sims (partial kelly.do-sims :simulations simulations :iterations iterations :include-history? True)
       kelly-sims (do-sims)
       half-sims (do-sims :strategy kelly.BettingStrategy.half)
@@ -26,7 +26,7 @@
              [half-kelly-sims "Half Kelly" "green"]
              [conservative-sims "Conservative" "red"]])
 (for [[x label c] plots]
-  (plt.plot x :c c :alpha .7))
+  (plt.plot x :c c :alpha .1 :lw 10))
 (plt.yscale "log")
 (plt.xticks (range iterations))
 (plt.legend :title "Betting Strategy" :handles (lfor [_ l c] plots (Patch :color c :label l)))
@@ -34,6 +34,8 @@
       :xlabel "Iteration No."
       :ylabel "Balance"
       :title "")
+(plt.show)
+
 (plt.savefig "strategies_overtime.png")
 
 
@@ -42,10 +44,17 @@
 ;; 
 
 (setv by-group (df.apply
-                 (fn [s] (pd.Series {"<       init" (.mean (< s 100))
-                                     ">=      init" (.mean (> s 100))
-                                     ">=  2 * init" (.mean (>= s 200))
-                                     ">= 10 * init" (.mean (>= s 1000))}))))
+                 (fn [s] (pd.Series {"Lose Money" (.mean (< s 100))
+                                     "Gain Money" (.mean (> s 100))
+                                     "2x Your Money" (.mean (>= s 200))
+                                     "5x Your Money" (.mean (>= s 500))
+                                     "10 x Your Money" (.mean (>= s 1000))}))))
+(by-group.plot.barh :width .6 :title "After 20 rounds of betting, how likely are you to:")
+(plt.legend :title "Betting Strategy")
+(plt.tight-layout)
+(.invert-yaxis (plt.gca))
+(.set-major-formatter (. (plt.gca) xaxis) "{x:.0%}")
+(plt.savefig "bar_probs.png")
 
 (-> df
     (.apply (fn [s] (-> s

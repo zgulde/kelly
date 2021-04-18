@@ -18,6 +18,8 @@ The work in this repo is done with [the hy programming language](https://hylang.
 
 ![](strategies_overtime.png)
 
+![](bar_probs.png)
+
 ## Contents
 
 - `kelly.hy` contains functions for implementing different betting strategies and functions for creating simulations with different those betting strategies.
